@@ -1,18 +1,6 @@
 version: "3.9"
 
 services:
-  mosquitto:
-    image: eclipse-mosquitto
-    container_name: mqtt-broker
-    ports:
-      - 1883:1883
-    volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-      - ./mqtt_to_mysql/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    networks:
-      - mqtt_network
-
   mysql:
     image: mysql:latest
     container_name: mysql-db
@@ -28,22 +16,12 @@ services:
       - ./mqtt_to_mysql/sql_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - mqtt_network
-
-  adminphp:
-    image: phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: mysql-db
-      PMA_USER: mqtt_user
-      PMA_PASSWORD: mqttpassword
-    ports:
-      - 8080:8080
-    volumes:
-      - ./mqtt_to_mysql/apache.conf:/etc/apache2/conf-available/servername.conf
-    command: "apache2ctl -D FOREGROUND -f /etc/apache2/conf-available/servername.conf"
-    networks:
-      - mqtt_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s  # Startperiod to give MySQL-server time to startup
 
   mqtt_client:
     build:
@@ -51,8 +29,22 @@ services:
       dockerfile: Dockerfile
     container_name: mqtt-python-client
     depends_on:
-      - mysql
-      - mosquitto
+      mysql:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    networks:
+      - mqtt_network
+
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mqtt-broker
+    ports:
+      - 1883:1883
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mqtt_to_mysql/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       - mqtt_network
 
