@@ -4,7 +4,7 @@ FROM python:3.9
 # Set the working directory within the container
 WORKDIR /app
 
-# copy requirements.txt and install the Python dependencies
+# Copy requirements.txt and install the Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
