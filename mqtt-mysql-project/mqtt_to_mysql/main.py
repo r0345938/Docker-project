@@ -2,7 +2,7 @@ import logging
 import time
 import threading
 from mqtt_handler import setup_mqtt_client
-
+from testdata import generate_test_data_continuously
 
 # Logger configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
