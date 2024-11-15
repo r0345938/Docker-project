@@ -1,71 +1,71 @@
 from paho.mqtt.client import Client
 import logging
 import json
-import mysql.connector
+from mqtt_to_mysql.mysql_handler import store_data_in_db
 
-# Logger config
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Logger configuration
 logger = logging.getLogger(__name__)
 
-# MySQL config
-db_config = {
-    'user': 'mqtt_user',
-    'password': 'mqttpassword',
-    'host': 'mysql-db',
-    'database': 'mqtt_data',
-}
+# MQTT configuration
+BROKER_ADDRESS = "mqtt-broker"
+PORT = 1883
+TOPIC = "sensor/data"
+
+def setup_mqtt_client():
+    """
+    Set up the MQTT client, including callbacks for connection and message reception.
+    
+    :return: Configured MQTT client.
+    """
+    client = Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    try:
+        client.connect(BROKER_ADDRESS, PORT, 60)
+        return client
+    except Exception as e:
+        logger.error(f"Failed to connect to MQTT broker: {e}")
+        raise e
 
 def on_connect(client, userdata, flags, rc):
+    """
+    Callback when the MQTT client connects to the broker.
+    """
     if rc == 0:
-        client.subscribe("sensor/data")
-        logger.info("Connected to MQTT broker and subscribed to 'sensor/data'")
+        client.subscribe(TOPIC)
+        logger.info(f"Connected to MQTT broker and subscribed to '{TOPIC}'")
     else:
         logger.error(f"Failed to connect to MQTT broker. Return code: {rc}")
 
 def on_message(client, userdata, msg):
+    """
+    Callback when a message is received from the broker.
+    """
     logger.info(f"Message received on topic {msg.topic}: {msg.payload.decode()}")
     try:
         payload = json.loads(msg.payload.decode())
         logger.info(f"Decoded payload: {payload}")
 
         if 'temperature' in payload and 'pressure' in payload:
-            # Connect with MySQL
-            try:
-                db = mysql.connector.connect(**db_config)
-                cursor = db.cursor()
-                
-                # Add data into database
-                insert_query = "INSERT INTO sensor_data (temperature, pressure) VALUES (%s, %s)"
-                cursor.execute(insert_query, (payload['temperature'], payload['pressure']))
-                db.commit()
-                logger.info(f"Data successfully inserted into database: {payload}")
-                
-            except mysql.connector.Error as err:
-                logger.error(f"Database error: {err}")
-            except Exception as e:
-                logger.error(f"Unexpected error during database operation: {e}")
-            finally:
-                if cursor:
-                    cursor.close()
-                if db:
-                    db.close()
-                logger.info("MySQL connection closed.")
+            store_data_in_db(payload)
         else:
             logger.warning("Unexpected JSON format. Required fields missing: 'temperature' and 'pressure'")
-    
     except json.JSONDecodeError as e:
         logger.error(f"Failed to decode JSON payload: {e}")
     except Exception as e:
         logger.error(f"Unexpected error while processing the message: {e}")
 
-def setup_mqtt_client():
-    client = Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-
+def publish_message(client, topic, payload):
+    """
+    Publish a message to the given MQTT topic.
+    
+    :param client: MQTT client instance.
+    :param topic: Topic to publish the message to.
+    :param payload: The payload to publish.
+    """
     try:
-        client.connect("mqtt-broker", 1883, 60)
-        return client
+        payload_str = json.dumps(payload)
+        client.publish(topic, payload_str)
+        logger.info(f"Published test data to topic '{topic}': {payload_str}")
     except Exception as e:
-        logger.error(f"Failed to connect to MQTT broker: {e}")
-        raise e
+        logger.error(f"Failed to publish message to topic '{topic}': {e}")
