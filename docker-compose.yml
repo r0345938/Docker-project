@@ -1,20 +1,8 @@
 version: "3.9"
 
 services:
-  mosquitto:
-    image: eclipse-mosquitto 
-    container_name: mqtt-broker
-    ports:
-      - 1883:1883
-    volumes:
-      - mosquitto_data:/mosquitto/data
-      - mosquitto_logs:/mosquitto/log
-      - ./mqtt_to_mysql/mosquitto.conf:/mosquitto/config/mosquitto.conf
-    networks:
-      - mqtt_network
-
   mysql:
-    image: mysql:latest 
+    image: mysql:latest
     container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword123
@@ -29,27 +17,43 @@ services:
     networks:
       - mqtt_network
 
-  adminphp:
-    image: phpmyadmin  
-    container_name: phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: mysql-db
-      PMA_USER: mqtt_user
-      PMA_PASSWORD: mqttpassword
-    ports:
-      - 8080:8080
+  mqtt_client:
+    build:
+      context: .
+      dockerfile: mqtt_to_mysql/Dockerfile
+    image: mqtt-python-client
+    container_name: mqtt-python-client
+    depends_on:
+      - mysql    
+      - mosquitto
     networks:
       - mqtt_network
 
-  mqtt_client:
-    build:
-      context: ./mqtt_to_mysql
-      dockerfile: Dockerfile
-    container_name: mqtt-python-client
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - mysql
-      - mosquitto
+    networks:
+      - mqtt_network
+
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mqtt-broker
+    ports:
+      - 1883:1883
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mqtt_to_mysql/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks:
       - mqtt_network
 

@@ -1,31 +1,43 @@
-from mqtt_handler import setup_mqtt_client
-from testdata import generate_test_data_continuously
 import logging
 import time
 import threading
+from mqtt_to_mysql.mqtt_handler import setup_mqtt_client
+from mqtt_to_mysql.testdata import generate_test_data_continuously
 
-# Logger configuratie
+
+# Logger configuration
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
-    # Start de MQTT client
+def start_mqtt_client():
     try:
         logger.info("Starting the MQTT client...")
         client = setup_mqtt_client()
-        client.loop_start()  # Start de MQTT client in een aparte thread zodat het script niet stopt
+        client.loop_start()  # Start the MQTT client in a separate thread so that the script does not stop
+        return client
     except Exception as e:
         logger.error(f"Error occurred while setting up MQTT client: {e}")
+        raise e
 
-    # Wacht een paar seconden voordat we de MySQL-server benaderen
-    time.sleep(30)  # Wacht 30 seconden om er zeker van te zijn dat MySQL gereed is
-
-    # Start het genereren van continue testdata in een aparte thread
-    logger.info("Starting continuous data generation...")
+def start_generating_test_data():
+    logger.info("Starting continuous data generation via MQTT...")
     testdata_thread = threading.Thread(target=generate_test_data_continuously, args=(5,), daemon=True)
     testdata_thread.start()
 
-    # Houd de container draaiende
+if __name__ == "__main__":
+    # Start the MQTT client
+    client = start_mqtt_client()
+
+    # Wait a few seconds to ensure MySQL is ready
+    time.sleep(20)
+
+    # Start continuous data generation
+    start_generating_test_data() # ONLY IN USE FOR GENERATING TEST DATA
+
+    # Keep the container running
     logger.info("MQTT client is now running. Keeping the container alive...")
-    while True:
-        time.sleep(1)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logger.info("Shutting down gracefully...")
