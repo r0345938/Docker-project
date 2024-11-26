@@ -1,6 +1,7 @@
 import logging
 import random
 import time
+import string
 from mqtt_to_mysql.mqtt_handler import setup_mqtt_client, publish_message
 
 # Logger configuration
@@ -24,6 +25,15 @@ def generate_test_data_continuously(interval=5):
             # Generate random temperature and pressure values
             temperature = round(random.uniform(20.0, 25.0), 2)
             pressure = round(random.uniform(1000.0, 1025.0), 2)
+
+            # TESTING Generate random temperature and pressure values (NO FLOAT)
+            #temperature =  random.randint(20, 25)
+            #pressure = random.randint(1000, 1025)
+
+            # TESTING Generate random strings for temperature and pressure
+            #temperature = ''.join(random.choice(string.ascii_letters) for i in range(5))
+            #pressure = ''.join(random.choice(string.ascii_letters) for i in range(4))
+
             payload = {
                 "temperature": temperature,
                 "pressure": pressure

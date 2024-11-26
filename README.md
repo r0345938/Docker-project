@@ -60,4 +60,8 @@ grafana/provisioning/datasources/mysql.yaml: Configuration file for the Grafana 
 grafana/dashboards/my_dashboard.json: Dashboard configuration for visualizing the sensor data.
 
 
+<<<<<<< Updated upstream
 Thank you for your interest in this project. Hopefully, this README helps you get started quickly!
+=======
+Thank you for your interest in this project. Hopefully, this README helps you get started quickly!
+>>>>>>> Stashed changes
