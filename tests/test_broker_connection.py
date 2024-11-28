@@ -21,14 +21,21 @@ class TestMQTTBrokerConnection(unittest.TestCase):
             self.connected = True
         else:
             print(f"Failed to connect, return code {rc}")
+            self.connected = False
 
     def test_broker_connection(self):
         # Connect to the broker
         self.client.connect(BROKER['host'], BROKER['port'], 60)
         
-        # Start the loop to process network events, and allow some time for connection
+        # Start the loop to process network events
         self.client.loop_start()
-        time.sleep(2)  # Give client time to make connection
+        
+        # Geef meer tijd voor de verbinding of hercontroleer de connectiviteit.
+        for _ in range(5):  # Tot 5 seconden wachten
+            if self.connected:
+                break
+            time.sleep(1)
+        
         self.client.loop_stop()
 
         # Assert client is connected
