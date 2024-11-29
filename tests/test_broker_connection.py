@@ -10,7 +10,7 @@ BROKER = {
 class TestMQTTBrokerConnection(unittest.TestCase):
 
     def setUp(self):
-        # Maak een nieuwe client
+        # Making new client
         self.client = mqtt.Client(client_id="test_client", protocol=mqtt.MQTTv311)
         self.client.on_connect = self.on_connect
         self.connected = False
@@ -25,7 +25,7 @@ class TestMQTTBrokerConnection(unittest.TestCase):
             self.connected = False
 
     def test_broker_connection(self):
-        # Probeer verbinding te maken met de broker
+        # Try to connect broker
         try:
             self.client.connect(BROKER['host'], BROKER['port'], 60)
         except Exception as e:
@@ -36,8 +36,8 @@ class TestMQTTBrokerConnection(unittest.TestCase):
         self.client.loop_start()
         print("Started MQTT loop")
 
-        # Wacht maximaal 20 seconden op verbinding
-        for _ in range(20):  # Wacht 20 seconden
+        # Wacht max 20s on connection
+        for _ in range(20):  # Wait 20 seconden
             if self.connected:
                 break
             time.sleep(1)
@@ -45,7 +45,7 @@ class TestMQTTBrokerConnection(unittest.TestCase):
         self.client.loop_stop()
         print("Stopped MQTT loop")
 
-        # Controleer of de verbinding succesvol was
+        # Check connection = success
         self.assertTrue(self.connected, "MQTT Broker connection failed.")
 
     def tearDown(self):
