@@ -3,7 +3,7 @@ import unittest
 import time
 
 BROKER = {
-    'host': 'localhost',
+    'host': '172.16.0.72',
     'port': 1883
 }
 TOPIC = "sensor/data"

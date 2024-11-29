@@ -18,7 +18,7 @@ def generate_test_data_continuously(interval=5):
     :param interval: The number of seconds to wait between generating each new data row.
     """
  # Set up MQTT client
-    client = setup_mqtt_client() # USE ONLY FOR TESTDATA + IN COMMENT FOR DAMIAN'S DATA
+    #client = setup_mqtt_client() # USE ONLY FOR TESTDATA + IN COMMENT FOR DAMIAN'S DATA
     
     try:
         while True:

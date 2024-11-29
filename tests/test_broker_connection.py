@@ -3,67 +3,55 @@ import unittest
 import time
 
 BROKER = {
-    'host': 'localhost', 
+    'host': '172.16.0.72', 
     'port': 1883
 }
 
 class TestMQTTBrokerConnection(unittest.TestCase):
 
     def setUp(self):
-        # Make new client
+        # Maak een nieuwe client
         self.client = mqtt.Client(client_id="test_client", protocol=mqtt.MQTTv311)
         self.client.on_connect = self.on_connect
         self.connected = False
 
-        # Optional: add logging
-        self.client.enable_logger()
-
     def on_connect(self, client, userdata, flags, rc):
-        # controle
+        print(f"on_connect called with rc={rc}")
         if rc == 0:
             print("Connected successfully to broker.")
             self.connected = True
-        elif rc == 1:
-            print("Connection refused - incorrect protocol version.")
-        elif rc == 2:
-            print("Connection refused - invalid client identifier.")
-        elif rc == 3:
-            print("Connection refused - server unavailable.")
-        elif rc == 4:
-            print("Connection refused - bad username or password.")
-        elif rc == 5:
-            print("Connection refused - not authorised.")
         else:
-            print(f"Failed to connect, unknown return code: {rc}")
-        self.connected = False
+            print(f"Connection failed with return code {rc}")
+            self.connected = False
 
     def test_broker_connection(self):
-        # connect with broker
+        # Probeer verbinding te maken met de broker
         try:
             self.client.connect(BROKER['host'], BROKER['port'], 60)
         except Exception as e:
             print(f"Error connecting to broker: {e}")
             self.fail("Exception raised during broker connection")
 
-        # Start loop to process network events
+        # Start netwerkloop
         self.client.loop_start()
+        print("Started MQTT loop")
 
-        # Give more time te let the connection fail or be succesfull
-        for _ in range(10):  # wait 10s to verify connectivity
+        # Wacht maximaal 20 seconden op verbinding
+        for _ in range(20):  # Wacht 20 seconden
             if self.connected:
                 break
             time.sleep(1)
 
-        # Stop the loop
         self.client.loop_stop()
+        print("Stopped MQTT loop")
 
-        # Assert client make succesfull connection
+        # Controleer of de verbinding succesvol was
         self.assertTrue(self.connected, "MQTT Broker connection failed.")
 
     def tearDown(self):
-        # Disconnect
         if self.connected:
             self.client.disconnect()
+
 
 if __name__ == '__main__':
     unittest.main()
