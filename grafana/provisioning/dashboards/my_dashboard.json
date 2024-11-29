@@ -1,0 +1,45 @@
+{
+  "uid": "temperature-pressure-dashboard",
+  "title": "My Sensor Dashboard",
+  "tags": [],
+  "timezone": "browser",
+  "refresh": "5s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Temperature °C",
+      "targets": [
+        {
+          "refId": "A",
+          "rawSql": "SELECT timestamp AS time, temperature FROM mqtt_data.sensor_data",
+          "format": "time_series"
+        }
+      ],
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Pressure hPa",
+      "targets": [
+        {
+          "refId": "B",
+          "rawSql": "SELECT timestamp AS time, pressure FROM mqtt_data.sensor_data",
+          "format": "time_series"
+        }
+      ],
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}
