@@ -4,6 +4,7 @@ import json
 from mqtt_to_mysql.mysql_handler import store_data_in_db
 
 # Logger configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # MQTT configuration
@@ -46,10 +47,25 @@ def on_message(client, userdata, msg):
         payload = json.loads(msg.payload.decode())
         logger.info(f"Decoded payload: {payload}")
 
+        # Check if the payload contains both temperature and pressure
         if 'temperature' in payload and 'pressure' in payload:
-            store_data_in_db(payload)
+            temperature = payload['temperature']
+            pressure = payload['pressure']
+
+            # Check if temperature is between 15 and 30, and pressure between 990 and 1020
+            if 15 <= temperature <= 30 and 990 <= pressure <= 1020:
+                # Store data only if both temperature and pressure are within the valid range
+                store_data_in_db(payload)
+                logger.info(f"Data stored: {payload}")
+            else:
+                # Log a warning if temperature or pressure is out of range
+                if not (15 <= temperature <= 30):
+                    logger.warning(f"Temperature {temperature}°C is out of acceptable range (15-30°C). Data will not be stored.")
+                if not (990 <= pressure <= 1020):
+                    logger.warning(f"Pressure {pressure} hPa is out of acceptable range (990-1020 hPa). Data will not be stored.")
         else:
             logger.warning("Unexpected JSON format. Required fields missing: 'temperature' and 'pressure'")
+
     except json.JSONDecodeError as e:
         logger.error(f"Failed to decode JSON payload: {e}")
     except Exception as e:
@@ -69,3 +85,7 @@ def publish_message(client, topic, payload):
         logger.info(f"Published test data to topic '{topic}': {payload_str}")
     except Exception as e:
         logger.error(f"Failed to publish message to topic '{topic}': {e}")
+
+if __name__ == "__main__":
+    client = setup_mqtt_client()
+    client.loop_forever()

@@ -32,7 +32,7 @@ if __name__ == "__main__":
     time.sleep(20)
 
     # Start continuous data generation
-    #start_generating_test_data() # ONLY IN USE FOR GENERATING TEST DATA
+    start_generating_test_data() # ONLY IN USE FOR GENERATING TEST DATA
 
     # Keep the container running
     logger.info("MQTT client is now running. Keeping the container alive...")

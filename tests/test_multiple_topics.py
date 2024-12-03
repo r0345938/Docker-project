@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import unittest
 import time
 
-BROKER = {'host': '172.16.0.72', 'port': 1883}
+BROKER = {'host': 'localhost', 'port': 1883}
 MULTIPLE_TOPICS = ["sensor/data", "sensor/status"]
 
 class TestMQTTMultipleTopics(unittest.TestCase):

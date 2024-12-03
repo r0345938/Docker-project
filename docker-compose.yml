@@ -9,6 +9,7 @@ services:
       MYSQL_DATABASE: mqtt_data
       MYSQL_USER: mqtt_user
       MYSQL_PASSWORD: mqttpassword
+      TZ: Europe/Brussels
     ports:
       - 3306:3306
     volumes:

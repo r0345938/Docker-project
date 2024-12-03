@@ -18,13 +18,13 @@ def generate_test_data_continuously(interval=5):
     :param interval: The number of seconds to wait between generating each new data row.
     """
  # Set up MQTT client
-    #client = setup_mqtt_client() # USE ONLY FOR TESTDATA + IN COMMENT FOR DAMIAN'S DATA
+    client = setup_mqtt_client() # USE ONLY FOR TESTDATA + IN COMMENT FOR DAMIAN'S DATA
     
     try:
         while True:
             # Generate random temperature and pressure values
-            temperature = round(random.uniform(20.0, 25.0), 2)
-            pressure = round(random.uniform(1000.0, 1025.0), 2)
+            temperature = round(random.uniform(15.0, 30.0), 2)
+            pressure = round(random.uniform(990.0, 1020.0), 2)
 
             # TESTING Generate random temperature and pressure values (NO FLOAT)
             #temperature =  random.randint(20, 25)

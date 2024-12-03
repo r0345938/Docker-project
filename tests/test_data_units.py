@@ -18,7 +18,7 @@ class TestDataUnits(unittest.TestCase):
         test_data = [
             (20.0, 1020.0),  
             (25.0, 1000.0), 
-            (15.0, 999.0) # Test failure
+            (10.0, 980.0) # Test failure
         ]
         self.cursor.executemany(insert_query, test_data)
         self.db_connection.commit()  # Commit data to database
@@ -34,10 +34,10 @@ class TestDataUnits(unittest.TestCase):
 
         # Assertion to check values are correct
         for (temperature, pressure) in result:
-            if temperature < 20:
-                error_messages.append(f"Temperature of {temperature}°C cannot be lower than 20° Celsius.")
-            if pressure < 1000:
-                error_messages.append(f"Pressure of {pressure} hPa cannot be lower than 1000 hPa.")
+            if temperature < 15:
+                error_messages.append(f"Temperature of {temperature}°C cannot be lower than 15° Celsius.")
+            if pressure < 990:
+                error_messages.append(f"Pressure of {pressure} hPa cannot be lower than 990 hPa.")
 
         # If there are any error messages, fail the test with all error messages
         if error_messages:

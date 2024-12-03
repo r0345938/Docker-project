@@ -3,7 +3,7 @@ import unittest
 import time
 
 BROKER = {
-    'host': '172.16.0.72', 
+    'host': 'localhost', 
     'port': 1883
 }
 

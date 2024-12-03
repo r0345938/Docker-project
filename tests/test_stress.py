@@ -3,7 +3,7 @@ import unittest
 import time
 import timeit
 
-BROKER = {'host': '172.16.0.72', 'port': 1883}
+BROKER = {'host': 'localhost', 'port': 1883}
 TOPIC = "sensor/data"
 
 class TestMQTTStress(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestMQTTStress(unittest.TestCase):
         self.client.on_message = self.on_message
         self.connected = False
         self.message_count = 0
-        self.total_messages = 150
+        self.total_messages = 50000
 
     def on_connect(self, client, userdata, flags, rc):
         if rc == 0:
