@@ -4,6 +4,11 @@ FROM python:3.9
 # Set the working directory within the container
 WORKDIR /app
 
+# Install tzdata for timezone support
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=Europe/Brussels
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Copy requirements.txt and install the Python dependencies
 COPY mqtt_to_mysql/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

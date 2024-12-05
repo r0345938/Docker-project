@@ -11,3 +11,4 @@ datasources:
     database: mqtt_data
     jsonData:
       tlsSkipVerify: true
+      timeZone: "Europe/Brussels"

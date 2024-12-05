@@ -1,9 +1,8 @@
 {
   "uid": "temperature-pressure-dashboard",
   "title": "My Sensor Dashboard",
+  "timezone": "Europe/Brussels",
   "tags": [],
-  "timezone": "browser",
-  "refresh": "5s",
   "panels": [
     {
       "type": "timeseries",

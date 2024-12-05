@@ -38,7 +38,7 @@ class TestMQTTStress(unittest.TestCase):
         start_time = timeit.default_timer()
         for i in range(self.total_messages):
             self.client.publish(TOPIC, f"message {i}")
-        time.sleep(5)  # Allow time for all messages to be received
+        time.sleep(5)  # Allow time in seconds for all messages to be received
         end_time = timeit.default_timer()
 
         # Assert all messages were received
